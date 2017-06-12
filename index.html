@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Star Wars Droid Name Generator</title>
+        <style>
+			fieldset { width: 10em;	}	/* Style the Form a bit */
+        </style>
+	</head>
+	<body>
+		<h1>Star Wars Droid Name Generator</h1>
+		
+		<form id="swForm"> <!-- Where User info is collected -->
+			<fieldset>
+				<legend>About You</legend>
+				<label for="inFirst">First name: </label><input type="text" placeholder="George" name="inFirst" id="inFirst"><br>
+				<label for="inLast">Last name: </label>  <input type="text" placeholder="Lucas" name="inLast" id="inLast"><br>
+				<label for="inDOB">Birthday: </label>    <input type="date" name="inDOB" id="inDOB"><br>	<!-- NOTE: Some browsers display a Date Picker. Some do not. This is dealt with in Line 88.-->
+			</fieldset>
+			<p><input type="button" value="Go" id="btnGo"> <input type="button" value="Clear" id="btnClear"></p>
+		</form>
+		
+		<div id="divShow"> <!-- Where all Results are shown -->
+			<div id="errorMsg">&nbsp;</div>
+			<div id="nameYou">&nbsp;</div>
+			<div id="nameDroid">&nbsp;</div>
+			<div id="nameType">&nbsp;</div>
+			<div><img src="" id="droidPic"></div>
+		</div>
+		
+		<script>
+			(function(){		// Immediately-Invoked Function Expression to prevent naming conflicts	- http://benalman.com/news/2010/11/immediately-invoked-function-expression/
+				"use strict";	// Use the JavaScript Strict Mode - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
+				
+				// Define JavaScript Objects for various HTML Nodes
+				var elSwForm    = document.getElementById("swForm"),
+					elBtnGo     = document.getElementById("btnGo"),
+					elBtnClear  = document.getElementById("btnClear"),
+					elErrorMsg  = document.getElementById("errorMsg"),
+					elNameYou   = document.getElementById("nameYou"),
+					elNameDroid = document.getElementById("nameDroid"),
+					elNameType  = document.getElementById("nameType"),
+					elDroidPic  = document.getElementById("droidPic");
+					
+				// Define Arrays to hold the Droid Types and Droid Pictures
+				var droidType = ["Astromech", "Battle", "Interrogation", "Medical", "Protocol", "Scout"],
+					droidPic  = ["astromech.png", "battle.png", "interrogation.png", "medical.png", "protocol.png", "scout.png"];
+				
+				function fnClearForm() {	// Function to clear the Form and perform other cleanup actions
+					elSwForm.reset();
+				}
+				
+				function fnGo() {	// Function that collects Input, Processes it, and displays Output
+					// Store the values typed into the Input Fields
+					var valInFirst = document.getElementById("inFirst").value,
+						valInLast  = document.getElementById("inLast").value,
+						valInDOB   = document.getElementById("inDOB").value;
+					
+					if((valInFirst !== '') && (valInLast !== '') && (valInDOB !== '')) {	// If...Else Conditional Statement to check if the Input Fields are NOT empty
+						elErrorMsg.style.display = "none";	// Hide the Error Message Div if NO errors
+						
+						var randomDroid = Math.floor(Math.random() * droidType.length);	// Generate a Random Number (rounded down) based on the number of Droid Types saved in the Array
+						
+						elNameYou.innerHTML = "Your Real Name: " + valInFirst + " " + valInLast;						// Display the First and Last Names the User input
+						elNameDroid.innerHTML = "Your Droid Name: " + fnDroidNameGen(valInFirst, valInLast, valInDOB);	// Using the fnDroidNameGen() Function, display a Droid Name
+						
+						if((randomDroid === 0) || (randomDroid === 2)) {	// Check if a Droid Name requires "A" or "An" grammar
+							// "An" grammar needed for Droid Types 0 and 2
+							elNameType.innerHTML = "You are an " + droidType[randomDroid] + " Droid.";	// Display the Droid Type based on the Random Number
+							elDroidPic.src = droidPic[randomDroid];										// Display the Droid Picture in the empty <img>
+						} else {
+							// "A" grammar needed for Droid Types 1, 3, 4, and 5
+							elNameType.innerHTML = "You are a " + droidType[randomDroid] + " Droid.";	// Display the Droid Type based on the Random Number
+							elDroidPic.src = droidPic[randomDroid];										// Display the Droid Picture in the empty <img>
+						}
+						
+						fnClearForm();	// Clear the Form so a User can generate a new Droid Name
+					} else {	// or Else the Input Fields ARE empty, so display an Error Message
+						elErrorMsg.innerHTML = "Please enter all fields!";
+						elErrorMsg.style.display = "block";	// Show the Error Message Div if YES errors
+					}
+				}
+				
+				function fnDroidNameGen(n1, n2, dob) {	// Function to Generate a Droid Name based on User's First Name, Last Name, and Date of Birth
+					var mo = parseInt(dob.slice(5, 7), 10),	// Starting at the 5 position and going to the 7th, slice the Month portion of the Date input, then convert it to an Integer, and save it to a Variable
+						myDroid = "";						// Create a Variable to hold the current Droid Name
+						
+						if (isNaN(mo)) {	// If the Date provided is NOT in the format 1977-05-25, it's Not a Number, so...
+							mo = Math.ceil(Math.random() * 12);	// ...generate a Random Number, rounded up, based on 12 (months)
+							console.log(mo);					// Display the Random (Month) Number in the Developer Console
+						}
+						
+					switch(mo) {	// Based on the User's Month, choose a Droid Name Scheme. Works by Slicing portions of the User's First/Last Names, appending dashes and Months, and converting the characters to UpperCase
+						case 1:	// January: BT-1
+							console.log("BT-1");
+							myDroid = n1.slice(0, 2).toUpperCase() + "-" + mo
+							break;
+						case 2:	// February: R2-D2
+							console.log("R2-D2");
+							myDroid = n1.slice(0, 1).toUpperCase() + mo + "-" + n2.slice(0, 1).toUpperCase() + mo;
+							break;
+						case 3:	// March: C-3PO
+							console.log("C-3PO");
+							myDroid = n1.slice(0, 1).toUpperCase() + "-" + mo + n2.slice(0, 2).toUpperCase();
+							break;	
+						case 8:	// August: IG-88
+							console.log("IG-88");
+							myDroid = n1.slice(0, 2).toUpperCase() + "-" + mo + mo;
+							break;
+						case 12:// December: K-2S0
+							console.log("K-2SO");
+							myDroid = n1.slice(0, 1).toUpperCase() + "-2" +  n2.slice(0, 2).toUpperCase();
+							break;
+						default:// If no Case (Month) is set up, display this Default Droid Name Scheme: 0-0-0
+							console.log("0-0-0");
+							myDroid = mo + "-" + mo + "-" + mo;
+							break;
+					}
+					
+					return myDroid;	// Return the Generated Droid Name
+				}
+				
+				// Event Handlers
+				elBtnGo.addEventListener("click", fnGo, false);				// When the Go Button is clicked, run the fnGo() function
+				elBtnClear.addEventListener("click", fnClearForm, false);	// When the Clear Button is clicked, run the fnClearform() function
+			
+			})(); 
+		</script>
+		<!-- 
+			Author:		V Campos <vmc@vmcink.net>
+			Project:	Star Wars Droid Name Generator
+			Date:		2016-12-16
+			Description:Enter your name and birthday to generate your own Star Wars Droid name!
+						http://www.vmcink.net/star-wars-droid-name-generator/
+		-->
+	</body>
+</html>
